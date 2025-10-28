@@ -1,0 +1,337 @@
+{
+  "defenses": [
+    {
+      "id": "barbed_wire",
+      "name": "Muro con alambre",
+      "type": "Block",
+      "baseHealth": 300,
+      "baseDamage": 0,
+      "range": 0,
+      "cost": 25,
+      "fields": 1,
+      "unlockLevel": 1,
+      "imagePath": "diblo/thewalkingtec/images/barbed_wire.png"
+    },
+    {
+      "id": "wall",
+      "name": "Muro Simple",
+      "type": "Block",
+      "baseHealth": 600,
+      "baseDamage": 0,
+      "range": 0,
+      "cost": 40,
+      "fields": 2,
+      "unlockLevel": 1,
+      "imagePath": "diblo/thewalkingtec/images/wall.png"
+    },
+    {
+      "id": "turret",
+      "name": "Torreta",
+      "type": "Ranged",
+      "baseHealth": 200,
+      "baseDamage": 30,
+      "range": 3,
+      "cost": 50,
+      "fields": 1,
+      "unlockLevel": 1,
+      "imagePath": "diblo/thewalkingtec/images/turret.png"
+    },
+    {
+      "id": "turret_medium",
+      "name": "Torreta Mejorada",
+      "type": "Ranged",
+      "baseHealth": 250,
+      "baseDamage": 45,
+      "range": 4,
+      "cost": 75,
+      "fields": 1,
+      "unlockLevel": 3,
+      "imagePath": "diblo/thewalkingtec/images/turret_medium.png"
+    },
+    {
+      "id": "drone",
+      "name": "Dron Atacante",
+      "type": "AERIAL",
+      "baseHealth": 100,
+      "baseDamage": 25,
+      "range": 0,
+      "cost": 50,
+      "fields": 1,
+      "unlockLevel": 1,
+      "imagePath": "diblo/thewalkingtec/images/drone.png"
+    }
+  ],
+  "enemies": [
+    {
+      "id": "zombie_basic",
+      "name": "Caminante",
+      "type": "Contact",
+      "aiType": "SEEK_NEAREST",
+      "baseHealth": 120,
+      "baseDamage": 15,
+      "speed": 0.5,
+      "cost": 1,
+      "fields": 1,
+      "unlockLevel": 1,
+      "imagePath": "diblo/thewalkingtec/images/zombie_basic.png"
+    },
+    {
+      "id": "zombie_runner",
+      "name": "Corredor",
+      "type": "Contact",
+      "aiType": "RANDOM",
+      "baseHealth": 80,
+      "baseDamage": 10,
+      "speed": 1.2,
+      "cost": 1,
+      "fields": 1,
+      "unlockLevel": 3,
+      "imagePath": "diblo/thewalkingtec/images/runner.png"
+    },
+    {
+      "id": "zombie_flyer",
+      "name": "Volador",
+      "type": "AERIAL",
+      "aiType": "CRASH",
+      "baseHealth": 60,
+      "baseDamage": 20,
+      "speed": 1.5,
+      "cost": 2,
+      "fields": 1,
+      "unlockLevel": 1,
+      "imagePath": "diblo/thewalkingtec/images/zombie_flyer.png"
+    }
+  ],
+  "levels": [
+    {
+      "levelNumber": 1,
+      "playerArmySize": 20,
+      "startingMoney": 450,
+      "enemyWaves": [
+        {
+          "zombieId": "zombie_basic",
+          "quantity": 11,
+          "delaySeconds": 0
+        }
+      ],
+      "defenseBoostPercent": 0.0,
+      "enemyBoostPercent": 0.0
+    },
+    {
+      "levelNumber": 2,
+      "playerArmySize": 25,
+      "startingMoney": 600,
+      "enemyWaves": [
+        {
+          "zombieId": "zombie_basic",
+          "quantity": 14,
+          "delaySeconds": 0
+        }
+      ],
+      "defenseBoostPercent": 3.0,
+      "enemyBoostPercent": 4.0
+    },
+    {
+      "levelNumber": 3,
+      "playerArmySize": 30,
+      "startingMoney": 700,
+      "enemyWaves": [
+        {
+          "zombieId": "zombie_basic",
+          "quantity": 17,
+          "delaySeconds": 0
+        },
+        {
+          "zombieId": "zombie_runner",
+          "quantity": 6,
+          "delaySeconds": 20
+        }
+      ],
+      "defenseBoostPercent": 6.0,
+      "enemyBoostPercent": 8.0
+    },
+    {
+      "levelNumber": 4,
+      "playerArmySize": 35,
+      "startingMoney": 800,
+      "enemyWaves": [
+        {
+          "zombieId": "zombie_basic",
+          "quantity": 20,
+          "delaySeconds": 0
+        },
+        {
+          "zombieId": "zombie_runner",
+          "quantity": 8,
+          "delaySeconds": 20
+        }
+      ],
+      "defenseBoostPercent": 9.0,
+      "enemyBoostPercent": 12.0
+    },
+    {
+      "levelNumber": 5,
+      "playerArmySize": 40,
+      "startingMoney": 900,
+      "enemyWaves": [
+        {
+          "zombieId": "zombie_basic",
+          "quantity": 23,
+          "delaySeconds": 0
+        },
+        {
+          "zombieId": "zombie_runner",
+          "quantity": 10,
+          "delaySeconds": 20
+        },
+        {
+          "zombieId": "zombie_flyer",
+          "quantity": 3,
+          "delaySeconds": 35
+        }
+      ],
+      "defenseBoostPercent": 12.0,
+      "enemyBoostPercent": 16.0
+    },
+    {
+      "levelNumber": 6,
+      "playerArmySize": 45,
+      "startingMoney": 1000,
+      "enemyWaves": [
+        {
+          "zombieId": "zombie_basic",
+          "quantity": 26,
+          "delaySeconds": 0
+        },
+        {
+          "zombieId": "zombie_runner",
+          "quantity": 12,
+          "delaySeconds": 20
+        },
+        {
+          "zombieId": "zombie_flyer",
+          "quantity": 4,
+          "delaySeconds": 35
+        }
+      ],
+      "defenseBoostPercent": 15.0,
+      "enemyBoostPercent": 20.0
+    },
+    {
+      "levelNumber": 7,
+      "playerArmySize": 50,
+      "startingMoney": 1150,
+      "enemyWaves": [
+        {
+          "zombieId": "zombie_basic",
+          "quantity": 29,
+          "delaySeconds": 0
+        },
+        {
+          "zombieId": "zombie_runner",
+          "quantity": 14,
+          "delaySeconds": 20
+        },
+        {
+          "zombieId": "zombie_flyer",
+          "quantity": 5,
+          "delaySeconds": 35
+        },
+        {
+          "zombieId": "zombie_basic",
+          "quantity": 12,
+          "delaySeconds": 50
+        }
+      ],
+      "defenseBoostPercent": 18.0,
+      "enemyBoostPercent": 24.0
+    },
+    {
+      "levelNumber": 8,
+      "playerArmySize": 55,
+      "startingMoney": 1300,
+      "enemyWaves": [
+        {
+          "zombieId": "zombie_basic",
+          "quantity": 32,
+          "delaySeconds": 0
+        },
+        {
+          "zombieId": "zombie_runner",
+          "quantity": 16,
+          "delaySeconds": 20
+        },
+        {
+          "zombieId": "zombie_flyer",
+          "quantity": 6,
+          "delaySeconds": 35
+        },
+        {
+          "zombieId": "zombie_basic",
+          "quantity": 14,
+          "delaySeconds": 50
+        }
+      ],
+      "defenseBoostPercent": 21.0,
+      "enemyBoostPercent": 28.0
+    },
+    {
+      "levelNumber": 9,
+      "playerArmySize": 60,
+      "startingMoney": 1500,
+      "enemyWaves": [
+        {
+          "zombieId": "zombie_basic",
+          "quantity": 35,
+          "delaySeconds": 0
+        },
+        {
+          "zombieId": "zombie_runner",
+          "quantity": 18,
+          "delaySeconds": 20
+        },
+        {
+          "zombieId": "zombie_flyer",
+          "quantity": 7,
+          "delaySeconds": 35
+        },
+        {
+          "zombieId": "zombie_basic",
+          "quantity": 16,
+          "delaySeconds": 50
+        }
+      ],
+      "defenseBoostPercent": 24.0,
+      "enemyBoostPercent": 32.0
+    },
+    {
+      "levelNumber": 10,
+      "playerArmySize": 65,
+      "startingMoney": 1750,
+      "enemyWaves": [
+        {
+          "zombieId": "zombie_basic",
+          "quantity": 38,
+          "delaySeconds": 0
+        },
+        {
+          "zombieId": "zombie_runner",
+          "quantity": 20,
+          "delaySeconds": 20
+        },
+        {
+          "zombieId": "zombie_flyer",
+          "quantity": 8,
+          "delaySeconds": 35
+        },
+        {
+          "zombieId": "zombie_basic",
+          "quantity": 18,
+          "delaySeconds": 50
+        }
+      ],
+      "defenseBoostPercent": 27.0,
+      "enemyBoostPercent": 36.0
+    }
+  ]
+}
