@@ -15,20 +15,29 @@ import javafx.stage.Stage;
 import java.io.File;
 
 /**
- * Interfaz de usuario consolidada - Menú y gestión de partidas
+ * Interfaz de usuario consolidada.
+ * Actúa como el controlador principal de la UI, gestionando el Menú Principal
+ * y lanzando el GameRenderer cuando se inicia o carga una partida.
  */
 public class GameUI {
     private Stage primaryStage;
-    private Game currentGame;
-    private GameRenderer currentRenderer;
+    private Game currentGame; // Instancia del juego actual
+    private GameRenderer currentRenderer; // Instancia del renderizador actual
 
+    /**
+     * Inicia la aplicación de UI, mostrando el menú principal.
+     * @param primaryStage El Stage principal de JavaFX.
+     */
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         primaryStage.setTitle("The Walking TEC");
-        primaryStage.setOnCloseRequest(e -> cleanup());
+        primaryStage.setOnCloseRequest(e -> cleanup()); // Asegura que se limpie al cerrar
         showMainMenu();
     }
 
+    /**
+     * Muestra la escena del Menú Principal.
+     */
     private void showMainMenu() {
         VBox root = createMainMenu();
         Scene scene = new Scene(root, 800, 600);
@@ -36,6 +45,9 @@ public class GameUI {
         primaryStage.show();
     }
 
+    /**
+     * Construye el VBox del Menú Principal con sus botones.
+     */
     private VBox createMainMenu() {
         VBox root = new VBox(20);
         root.setPadding(new Insets(30));
@@ -48,6 +60,7 @@ public class GameUI {
         Label subtitleLabel = new Label("Protege la reliquia");
         subtitleLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #cccccc;");
 
+        // Botones del menú
         Button newGameBtn = createMenuButton("Nueva Partida", this::showNewGameDialog);
         Button loadGameBtn = createMenuButton("Cargar Partida", this::loadGame);
         Button instructionsBtn = createMenuButton("Instrucciones", this::showInstructions);
@@ -61,6 +74,9 @@ public class GameUI {
         return root;
     }
 
+    /**
+     * Helper para crear un botón de menú estilizado.
+     */
     private Button createMenuButton(String text, Runnable action) {
         Button btn = new Button(text);
         btn.setMinWidth(250);
@@ -73,6 +89,7 @@ public class GameUI {
                         "-fx-cursor: hand;"
         );
 
+        // Efecto Hover
         btn.setOnMouseEntered(e -> btn.setStyle(btn.getStyle().replace("#444444", "#555555")));
         btn.setOnMouseExited(e -> btn.setStyle(btn.getStyle().replace("#555555", "#444444")));
         btn.setOnAction(e -> action.run());
@@ -80,6 +97,9 @@ public class GameUI {
         return btn;
     }
 
+    /**
+     * Muestra un diálogo para pedir el nombre del jugador.
+     */
     private void showNewGameDialog() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Nueva Partida");
@@ -89,24 +109,31 @@ public class GameUI {
         dialog.showAndWait().ifPresent(playerName -> {
             playerName = playerName.trim();
             if (!playerName.isEmpty()) {
-                startNewGame(playerName);
+                startNewGame(playerName); // Inicia el juego si el nombre es válido
             } else {
                 showAlert(Alert.AlertType.WARNING, "Error", "Por favor ingrese un nombre válido");
             }
         });
     }
 
+    /**
+     * Inicia una nueva partida.
+     * @param playerName El nombre del jugador.
+     */
     private void startNewGame(String playerName) {
         Logger.info("Iniciando nueva partida para: " + playerName);
-        cleanup(); // Limpiar juego anterior si existe
+        cleanup(); // Limpia cualquier juego anterior
 
-        currentGame = new Game(playerName);
-        currentRenderer = new GameRenderer(currentGame, this);
-        currentRenderer.start(primaryStage);
-        currentGame.start(true); // Iniciar el game loop para un nuevo juego
-        currentRenderer.getPauseResumeBtn().setText("Pausar");
+        currentGame = new Game(playerName); // Crea la instancia del motor
+        currentRenderer = new GameRenderer(currentGame, this); // Crea el renderizador
+        currentRenderer.start(primaryStage); // Muestra la escena del juego
+        currentGame.start(true); // Inicia el bucle de juego
+        currentRenderer.getPauseResumeBtn().setText("Pausar"); // Pone el botón en "Pausar"
     }
 
+    /**
+     * Muestra un FileChooser para cargar una partida guardada.
+     */
     private void loadGame() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Cargar Partida");
@@ -117,22 +144,25 @@ public class GameUI {
         File file = fileChooser.showOpenDialog(primaryStage);
         if (file != null) {
             Logger.info("Cargando partida desde: " + file.getAbsolutePath());
-            Game game = SaveManager.loadGame(file.getAbsolutePath());
+            Game game = SaveManager.loadGame(file.getAbsolutePath()); // Intenta cargar
 
             if (game != null) {
-                cleanup(); // Limpiar juego anterior
-                currentGame = game;
+                cleanup(); // Limpia juego anterior
+                currentGame = game; // Asigna el juego cargado
                 currentRenderer = new GameRenderer(currentGame, this);
                 currentRenderer.start(primaryStage);
-                currentGame.start(false); // Iniciar el game loop para un juego cargado
-                currentGame.resume(); // Asegurarse de que no esté pausado
-                currentRenderer.getPauseResumeBtn().setText("Pausar"); // <--- AÑADE ESTA LÍNEA
+                currentGame.start(false); // Inicia bucle (false = no es juego nuevo)
+                currentGame.resume(); // Asegura que inicie corriendo
+                currentRenderer.getPauseResumeBtn().setText("Pausar");
             } else {
                 showAlert(Alert.AlertType.ERROR, "Error", "No se pudo cargar la partida. El archivo puede estar corrupto.");
             }
         }
     }
 
+    /**
+     * Muestra una alerta con las instrucciones del juego.
+     */
     private void showInstructions() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Instrucciones");
@@ -153,11 +183,17 @@ public class GameUI {
         alert.showAndWait();
     }
 
+    /**
+     * Método llamado por GameRenderer para volver al menú principal.
+     */
     public void returnToMainMenu() {
-        cleanup();
-        showMainMenu();
+        cleanup(); // Detiene el juego y el renderizador
+        showMainMenu(); // Muestra el menú
     }
 
+    /**
+     * Limpia las instancias de Game y GameRenderer para liberar recursos.
+     */
     private void cleanup() {
         if (currentRenderer != null) {
             currentRenderer.cleanup();

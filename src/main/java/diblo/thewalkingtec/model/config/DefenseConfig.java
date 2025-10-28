@@ -13,11 +13,11 @@ public class DefenseConfig {
     private String imagePath;
 
     // Getters and Setters
-    public int getFields() { // <--- AÑADIR ESTE MÉTODO
+    public int getFields() {
         return fields;
     }
 
-    public void setFields(int fields) { // <--- AÑADIR ESTE MÉTODO
+    public void setFields(int fields) {
         this.fields = fields;
     }
 

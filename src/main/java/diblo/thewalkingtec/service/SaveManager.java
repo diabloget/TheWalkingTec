@@ -18,15 +18,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Gestor para guardar y cargar partidas en formato JSON
+ * Gestor estático para guardar y cargar el estado de una partida (Game)
+ * en formato JSON (serialización manual).
  */
 public class SaveManager {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
+    /**
+     * Guarda el estado actual del juego en un archivo JSON.
+     *
+     * @param game El objeto Game a guardar.
+     * @param filePath La ruta del archivo (ej. "partida.json").
+     * @return true si se guardó con éxito.
+     */
     public static boolean saveGame(Game game, String filePath) {
         try {
+            // 1. Convierte el objeto Game a un objeto simple (GameSaveData)
             GameSaveData saveData = new GameSaveData(game);
+            // 2. Serializa GameSaveData usando Gson
             try (FileWriter writer = new FileWriter(filePath)) {
                 GSON.toJson(saveData, writer);
             }
@@ -38,15 +48,22 @@ public class SaveManager {
         }
     }
 
+    /**
+     * Carga un estado de juego desde un archivo JSON.
+     *
+     * @param filePath La ruta del archivo (ej. "partida.json").
+     * @return El objeto Game restaurado, o null si falló.
+     */
     public static Game loadGame(String filePath) {
         try {
-            // Validar que la configuración esté cargada
+            // Validación: La configuración global DEBE estar cargada antes de cargar una partida
             if (ConfigurationManager.getConfig() == null) {
                 Logger.error("Configuración no cargada. No se puede restaurar la partida.");
                 return null;
             }
 
             GameSaveData saveData;
+            // 1. Deserializa el JSON a un objeto GameSaveData
             try (FileReader reader = new FileReader(filePath)) {
                 saveData = GSON.fromJson(reader, GameSaveData.class);
             }
@@ -56,6 +73,7 @@ public class SaveManager {
                 return null;
             }
 
+            // 2. Convierte el objeto simple (GameSaveData) de vuelta a un objeto Game complejo
             Game game = saveData.toGame();
             Logger.info("Partida cargada desde: " + filePath);
             return game;
@@ -70,9 +88,11 @@ public class SaveManager {
     }
 
     /**
-     * Estructura de datos para serializar/deserializar partidas
+     * Clase interna privada que representa la estructura de datos simple
+     * que se guarda/carga en el archivo JSON.
      */
     private static class GameSaveData {
+        // Datos del Jugador y Nivel
         String playerName;
         int playerLevel;
         int playerCoins;
@@ -80,8 +100,12 @@ public class SaveManager {
         int playerCapacityBase;
         int currentLevelIndex;
         int relicLife;
+        // Lista de todos los componentes (Zombies y Defensas) en el tablero
         List<ComponentData> activeComponents;
 
+        /**
+         * Constructor que "aplana" un objeto Game en esta estructura simple.
+         */
         public GameSaveData(Game game) {
             this.playerName = game.getPlayer().getName();
             this.playerLevel = game.getPlayer().getLevel();
@@ -92,12 +116,12 @@ public class SaveManager {
             this.relicLife = game.getRelicLife();
             this.activeComponents = new ArrayList<>();
 
-            // Guardar defensas
+            // Guardar defensas (vivas o muertas)
             game.getBoard().getActiveDefenses().forEach(c ->
                     activeComponents.add(new ComponentData(c))
             );
 
-            // Guardar zombies
+            // Guardar zombies (vivos o muertos)
             game.getBoard().getActiveZombies().forEach(c ->
                     activeComponents.add(new ComponentData(c))
             );
@@ -105,6 +129,9 @@ public class SaveManager {
             Logger.info("GameSaveData creado: " + activeComponents.size() + " componentes guardados");
         }
 
+        /**
+         * Validador simple para el archivo cargado.
+         */
         public boolean isValid() {
             return playerName != null &&
                     !playerName.isEmpty() &&
@@ -112,43 +139,45 @@ public class SaveManager {
                     currentLevelIndex >= 0;
         }
 
+        /**
+         * "Infla" este objeto de datos simple en un objeto Game funcional.
+         * @return El objeto Game restaurado.
+         */
         public Game toGame() {
-            // Crear nuevo juego con los datos guardados
+            // 1. Crear nuevo juego (esto carga el config.json)
             Game game = new Game(playerName);
 
-            // Restaurar estado del jugador
+            // 2. Restaurar estado del jugador y juego
             game.getPlayer().setLevel(playerLevel);
             game.getPlayer().setCoins(playerCoins);
             game.getPlayer().setScore(playerScore);
             game.setCurrentLevelIndex(currentLevelIndex);
             game.setRelicLife(relicLife);
-
-
-            // --- LÍNEAS FALTANTES (AÑADIR ESTAS DOS) ---
-            game.getPlayer().getArmy().setMaxCapacity(playerCapacityBase);
-            game.getPlayer().setCapacityBase(playerCapacityBase);
-            // --- FIN ---
+            game.getPlayer().getArmy().setMaxCapacity(playerCapacityBase); // Restaura capacidad
+            game.getPlayer().setCapacityBase(playerCapacityBase); // Restaura capacidad base
 
             GameConfig config = game.getGameConfig();
 
-            // Restaurar componentes
+            // 3. Restaurar componentes
             for (ComponentData data : activeComponents) {
+                // Re-crea el componente (Zombie o Defense) usando el config.json
+                // Se usa 0.0 para el boost, ya que la vida (max y current) se restaura manualmente.
                 Component component = createComponentFromData(data, config, game, 0.0);
 
                 if (component != null && data.position != null) {
+                    // Restaura estado (vida, posición)
                     component.setPosition(data.position);
-
-                    // Aplicar daño para restaurar vida actual
                     component.setMaxLife(data.maxLife);
                     component.setCurrentLife(data.currentLife);
 
-                    // Colocar en el tablero
+                    // Coloca en el tablero
                     if (game.getBoard().placeComponent(component, data.position)) {
+                        // Si es defensa, también se añade al Army del jugador
                         if (component instanceof Defense) {
                             game.getPlayer().getArmy().addDefense((Defense) component);
                         }
                     } else {
-                        Logger.warning("No se pudo colocar componente: " + data.id + " en " + data.position);
+                        Logger.warning("No se pudo colocar componente restaurado: " + data.id + " en " + data.position);
                     }
                 }
             }
@@ -157,8 +186,10 @@ public class SaveManager {
             return game;
         }
 
-        // En SaveManager.java -> GameSaveData
-// Cambia la firma del método:
+        /**
+         * Factory method para recrear un Component (Zombie o Defense)
+         * usando su ID y el GameConfig cargado.
+         */
         private Component createComponentFromData(ComponentData data, GameConfig config, Game game, double customBoost) {
 
             // Buscar primero en defensas
@@ -168,7 +199,7 @@ public class SaveManager {
                     .orElse(null);
 
             if (defenseConfig != null) {
-                // Usamos el customBoost (0.0) en lugar de recalcularlo
+                // Se usa customBoost (0.0) porque la vida se restaura manualmente
                 return new Defense(defenseConfig, customBoost);
             }
 
@@ -179,7 +210,6 @@ public class SaveManager {
                     .orElse(null);
 
             if (enemyConfig != null) {
-                // Usamos el customBoost (0.0) en lugar de recalcularlo
                 return new Zombie(enemyConfig, customBoost);
             }
 
@@ -189,14 +219,15 @@ public class SaveManager {
     }
 
     /**
-     * Información mínima necesaria para reconstruir un componente
+     * Información mínima necesaria para reconstruir un componente.
      */
     private static class ComponentData {
-        String id;
+        String id; // ID base (ej. "turret", "zombie_basic")
         Position position;
         int currentLife;
         int maxLife;
 
+        // Constructor "aplanador"
         public ComponentData(Component c) {
             this.id = c.getId();
             this.position = c.getPosition();

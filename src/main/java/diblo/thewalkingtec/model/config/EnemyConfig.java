@@ -4,7 +4,7 @@ public class EnemyConfig {
     private String id;
     private String name;
     private String type;
-    private String aiType; // NUEVO CAMPO
+    private String aiType;
     private int baseHealth;
     private int baseDamage;
     private double speed;
