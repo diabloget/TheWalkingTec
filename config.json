@@ -51,13 +51,13 @@
     {
       "id": "drone",
       "name": "Dron Atacante",
-      "type": "AERIAL",
+      "type": "Aerial",
       "baseHealth": 100,
       "baseDamage": 25,
       "range": 0,
       "cost": 50,
       "fields": 1,
-      "unlockLevel": 1,
+      "unlockLevel": 2,
       "imagePath": "diblo/thewalkingtec/images/drone.png"
     }
   ],
@@ -91,14 +91,14 @@
     {
       "id": "zombie_flyer",
       "name": "Volador",
-      "type": "AERIAL",
+      "type": "Aerial",
       "aiType": "CRASH",
       "baseHealth": 60,
       "baseDamage": 20,
       "speed": 1.5,
       "cost": 2,
       "fields": 1,
-      "unlockLevel": 1,
+      "unlockLevel": 5,
       "imagePath": "diblo/thewalkingtec/images/zombie_flyer.png"
     }
   ],
